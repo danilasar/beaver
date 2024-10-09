@@ -1,6 +1,6 @@
-mod systems;
-mod plugins;
-pub mod components;
+mod camera;
+mod map;
+mod core;
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::any::TypeId;
@@ -20,18 +20,9 @@ fn main() {
         .insert_resource(DebugPickingMode::Normal)
         .add_systems(Startup, (setup, setup_3d, setup_atlas))
         .add_systems(Update, (move_sprite, animate_sprite))
-        .add_systems(Startup, (systems::startup::startup, systems::startup::startup_cameras))
-        .add_systems(Startup, (systems::map::setup_map))
-        .add_systems(Update, log_pointer_event_debug::<events::Click>)
+        .add_systems(Startup, (camera::startup::startup))
+        .add_plugins(map::Map)
         .run();
-}
-
-pub fn log_pointer_event_debug<E: Debug + Clone + Reflect>(
-    mut pointer_events: EventReader<Pointer<E>>,
-) {
-    for event in pointer_events.read() {
-        println!("danilasar {event}");
-    }
 }
 
 fn move_sprite(

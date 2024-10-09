@@ -32,7 +32,8 @@ pub struct ProvinceBundle {
     pub province: Province,
     pub victory_points: VictoryPoints,
     pub terrain_type: TerrainType,
-    sprite: SpriteBundle,
+    pub sprite: SpriteBundle,
+    pub default_color: crate::core::components::DefaultColor
 }
 
 impl ProvinceBundle {
@@ -55,7 +56,8 @@ impl ProvinceBundle {
                     ..default()
                 },
                 ..default()
-            }
+            },
+            default_color: crate::core::components::DefaultColor(PROVINCE_COLOR)
         }
     }
 }
