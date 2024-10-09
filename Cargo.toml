@@ -6,3 +6,8 @@ edition = "2021"
 [dependencies]
 bevy="0.14.2"
 log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
+#space_editor = {git = "https://github.com/rewin123/space_editor.git"}
+bevy-inspector-egui="0.25.2"
+bevy_mod_picking="0.20.1"
+bevy_color = "0.14.3"
+bevy_render="0.14.2"
