@@ -11,3 +11,5 @@ bevy-inspector-egui="0.25.2"
 bevy_mod_picking="0.20.1"
 bevy_color = "0.14.3"
 bevy_render="0.14.2"
+serde = { version = "1.0.210", features = ["derive", "std"] }
+toml = "0.8.19"

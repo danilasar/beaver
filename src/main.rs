@@ -3,6 +3,7 @@ mod map;
 mod core;
 mod world;
 mod menu;
+mod utils;
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::any::TypeId;

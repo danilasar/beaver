@@ -1,0 +1,6 @@
+provinces = [
+    {id = 1, x = 0, y = 0, terrain = "Hills", vp = 25, adjacent = [2, 3]},
+    {id = 2, x = 10, y = 20, terrain = "Jungle", vp = 5, adjacent = [1, 4]},
+    {id = 3, x = 20, y = 10, terrain = "Desert", vp = 0, adjacent = [1, 4]},
+    {id = 4, x = 20, y = 20, terrain = "Forest", vp = 10, adjacent = [2, 3]}
+]

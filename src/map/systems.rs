@@ -1,12 +1,35 @@
+use std::collections::HashMap;
+use std::ops::DerefMut;
+use std::path::Path;
+use bevy::ecs::observer::TriggerTargets;
 use bevy::math::Vec3;
-use bevy::prelude::{default, Button, Changed, Commands, Query, Sprite, SpriteBundle, Transform, With};
+use bevy::prelude::{default, Button, Changed, Commands, Entity, Query, ResMut, Sprite, SpriteBundle, Transform, With, World};
 use bevy_color::Color;
 use bevy_mod_picking::prelude::{Drag, On, PickingInteraction, Pointer};
-use crate::map::components::{Province, ProvinceBundle, TerrainType, VictoryPoints};
+use log::error;
+use crate::map::components::{Province, ProvinceBundle, ProvinceId, TerrainType, VictoryPoints};
+use crate::map::province_parser::parse_provinces;
+use crate::map::resources::{ParsedProvincesFile, ProvincesCollection};
 
-pub fn setup_map(mut commands: Commands) {
-    commands.spawn((ProvinceBundle::new(VictoryPoints(0), TerrainType::Hills, Vec3::new(0.0, -200.0, 0.0))
-                   ));
+pub fn setup_map(mut world: &mut World) {
+    let mut new_provinces_collection = ProvincesCollection::default();
+    let provinces_data = parse_provinces();
+    for province_data in provinces_data {
+        let province = Province {
+            id: province_data.id.clone(),
+            victory_points: province_data.vp,
+            terrain_type: province_data.terrain,
+        };
+        let entity = world.spawn(
+            ProvinceBundle::new(
+                province,
+                Vec3::new(province_data.x, province_data.y, 0.0)
+            )
+        ).id();
+        new_provinces_collection.list.insert(province_data.id.clone(), entity);
+        new_provinces_collection.graph.insert(province_data.id, province_data.adjacent);
+    }
+    let _ = world.insert_resource::<ProvincesCollection>(new_provinces_collection);
 }
 
 #[allow(clippy::type_complexity)]
