@@ -1,6 +1,8 @@
 mod camera;
 mod map;
 mod core;
+mod world;
+mod menu;
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::any::TypeId;
@@ -10,170 +12,122 @@ use bevy::ecs::observer::TriggerTargets;
 use bevy_color::palettes;
 use bevy_mod_picking::prelude::*;
 
+
+const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+
+// Enum that will be used as a global state for the game
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+enum GameState {
+    #[default]
+    Splash,
+    Menu,
+    Game,
+}
+
+// One of the two settings that can be set through the menu. It will be a resource in the app
+#[derive(Resource, Debug, Component, PartialEq, Eq, Clone, Copy)]
+enum DisplayQuality {
+    Low,
+    Medium,
+    High,
+}
+
+// One of the two settings that can be set through the menu. It will be a resource in the app
+#[derive(Resource, Debug, Component, PartialEq, Eq, Clone, Copy)]
+struct Volume(u32);
+
+
 fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins.set(low_latency_window_plugin()),
             DefaultPickingPlugins,
         ))
+        // Insert as resource the initial value for the settings resources
+        .insert_resource(DisplayQuality::Medium)
+        .insert_resource(Volume(7))
+        // Declare the game state, whose starting value is determined by the `Default` trait
+        .init_state::<GameState>()
+        .add_systems(Startup, (camera::startup::startup))
+        // Adds the plugins for each state
+        .add_plugins((splash::splash_plugin, menu::menu_plugin, world::game_plugin))
         .add_plugins(WorldInspectorPlugin::new())
         .insert_resource(DebugPickingMode::Normal)
-        .add_systems(Startup, (setup, setup_3d, setup_atlas))
-        .add_systems(Update, (move_sprite, animate_sprite))
-        .add_systems(Startup, (camera::startup::startup))
-        .add_plugins(map::Map)
         .run();
 }
 
-fn move_sprite(
-    time: Res<Time>,
-    mut sprite: Query<&mut Transform, (Without<Sprite>, With<Children>)>,
-) {
-    let t = time.elapsed_seconds() * 0.1;
-    for mut transform in &mut sprite {
-        let new = Vec2 {
-            x: 50.0 * t.sin(),
-            y: 50.0 * (t * 2.0).sin(),
-        };
-        transform.translation.x = new.x;
-        transform.translation.y = new.y;
+mod splash {
+    use bevy::prelude::*;
+
+    use super::{despawn_screen, GameState};
+
+    // This plugin will display a splash screen with Bevy logo for 1 second before switching to the menu
+    pub fn splash_plugin(app: &mut App) {
+        // As this plugin is managing the splash screen, it will focus on the state `GameState::Splash`
+        app
+            // When entering the state, spawn everything needed for this screen
+            .add_systems(OnEnter(GameState::Splash), splash_setup)
+            // While in this state, run the `countdown` system
+            .add_systems(Update, countdown.run_if(in_state(GameState::Splash)))
+            // When exiting the state, despawn everything that was spawned for this screen
+            .add_systems(OnExit(GameState::Splash), despawn_screen::<OnSplashScreen>);
     }
-}
 
-/// Set up a scene that tests all sprite anchor types.
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let len = 128.0;
-    let sprite_size = Some(Vec2::splat(len / 2.0));
+    // Tag component used to tag entities added on the splash screen
+    #[derive(Component)]
+    struct OnSplashScreen;
 
-    commands
-        .spawn(SpatialBundle::default())
-        .with_children(|commands| {
-            for (anchor_index, anchor) in [
-                Anchor::TopLeft,
-                Anchor::TopCenter,
-                Anchor::TopRight,
-                Anchor::CenterLeft,
-                Anchor::Center,
-                Anchor::CenterRight,
-                Anchor::BottomLeft,
-                Anchor::BottomCenter,
-                Anchor::BottomRight,
-                Anchor::Custom(Vec2::new(0.5, 0.5)),
-            ]
-                .iter()
-                .enumerate()
-            {
-                let i = (anchor_index % 3) as f32;
-                let j = (anchor_index / 3) as f32;
+    // Newtype to use a `Timer` for this screen as a resource
+    #[derive(Resource, Deref, DerefMut)]
+    struct SplashTimer(Timer);
 
-                // spawn black square behind sprite to show anchor point
-                commands.spawn(SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: sprite_size,
-                        color: Color::BLACK,
+    fn splash_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+        let icon = asset_server.load("branding/icon.png");
+        // Display the logo
+        commands
+            .spawn((
+                NodeBundle {
+                    style: Style {
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
                         ..default()
                     },
-                    transform: Transform::from_xyz(i * len - len, j * len - len, -1.0),
                     ..default()
-                });
-
-                commands.spawn(SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: sprite_size,
-                        color: Color::from(palettes::basic::RED),
-                        anchor: anchor.to_owned(),
+                },
+                OnSplashScreen,
+            ))
+            .with_children(|parent| {
+                parent.spawn(ImageBundle {
+                    style: Style {
+                        // This will set the logo to be 200px wide, and auto adjust its height
+                        width: Val::Px(200.0),
                         ..default()
                     },
-                    texture: asset_server.load("images/boovy.png"),
-                    // 3x3 grid of anchor examples by changing transform
-                    transform: Transform::from_xyz(i * len - len, j * len - len, 0.0)
-                        .with_scale(Vec3::splat(1.0 + (i - 1.0) * 0.2))
-                        .with_rotation(Quat::from_rotation_z((j - 1.0) * 0.2)),
+                    image: UiImage::new(icon),
                     ..default()
                 });
-            }
-        });
-}
+            });
+        // Insert the timer as a resource
+        commands.insert_resource(SplashTimer(Timer::from_seconds(1.0, TimerMode::Once)));
+    }
 
-#[derive(Component)]
-struct AnimationIndices {
-    first: usize,
-    last: usize,
-}
-
-#[derive(Component, Deref, DerefMut)]
-struct AnimationTimer(Timer);
-
-fn animate_sprite(
-    time: Res<Time>,
-    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
-) {
-    for (indices, mut timer, mut sprite) in &mut query {
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            sprite.index = if sprite.index == indices.last {
-                indices.first
-            } else {
-                sprite.index + 1
-            };
+    // Tick the timer, and change state when finished
+    fn countdown(
+        mut game_state: ResMut<NextState<GameState>>,
+        time: Res<Time>,
+        mut timer: ResMut<SplashTimer>,
+    ) {
+        if timer.tick(time.delta()).finished() {
+            game_state.set(GameState::Menu);
         }
     }
 }
 
-fn setup_atlas(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let texture_handle = asset_server.load("images/gabe-idle-run.png");
-    let layout = TextureAtlasLayout::from_grid(UVec2::new(24, 24), 7, 1, None, None);
-    let texture_atlas_layout_handle = texture_atlas_layouts.add(layout);
-    // Use only the subset of sprites in the sheet that make up the run animation
-    let animation_indices = AnimationIndices { first: 1, last: 6 };
-    commands.spawn((
-        TextureAtlas {
-            layout: texture_atlas_layout_handle,
-            index: animation_indices.first,
-        },
-        SpriteBundle {
-            texture: texture_handle,
-            transform: Transform::from_xyz(300.0, 0.0, 0.0).with_scale(Vec3::splat(6.0)),
-            ..default()
-        },
-        animation_indices,
-        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-    ));
-}
-
-fn setup_3d(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(bevy_render::mesh::PlaneMeshBuilder::from_length(5.0)),
-            material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-            ..default()
-        },
-        PickableBundle::default(), // Optional: adds selection, highlighting, and helper components.
-    ));
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Cuboid::default()),
-            material: materials.add(Color::srgb(0.8, 0.7, 0.6)),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
-        PickableBundle::default(), // Optional: adds selection, highlighting, and helper components.
-    ));
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(4.0, 8.0, -4.0),
-        ..default()
-    });
-
+// Generic system that takes a component as a parameter, and will despawn all entities with that component
+fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
+    for entity in &to_despawn {
+        commands.entity(entity).despawn_recursive();
+    }
 }
