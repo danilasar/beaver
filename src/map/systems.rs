@@ -1,17 +1,12 @@
-use std::collections::HashMap;
-use std::ops::DerefMut;
-use std::path::Path;
-use bevy::ecs::observer::TriggerTargets;
 use bevy::math::Vec3;
-use bevy::prelude::{default, Button, Changed, Commands, Entity, Query, ResMut, Sprite, SpriteBundle, Transform, With, World};
+use bevy::prelude::{Changed, Query, Sprite, With, World};
 use bevy_color::Color;
-use bevy_mod_picking::prelude::{Drag, On, PickingInteraction, Pointer};
-use log::error;
-use crate::map::components::{Province, ProvinceBundle, ProvinceId, TerrainType, VictoryPoints};
+use bevy_mod_picking::prelude::PickingInteraction;
+use crate::map::components::{Province, ProvinceBundle};
 use crate::map::province_parser::parse_provinces;
-use crate::map::resources::{ParsedProvincesFile, ProvincesCollection};
+use crate::map::resources::ProvincesCollection;
 
-pub fn setup_map(mut world: &mut World) {
+pub fn setup_map(world: &mut World) {
     let mut new_provinces_collection = ProvincesCollection::default();
     let provinces_data = parse_provinces();
     for province_data in provinces_data {

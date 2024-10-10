@@ -1,4 +1,4 @@
-use bevy::prelude::{default, AssetServer, Assets, Camera2dBundle, Camera3dBundle, Color, ColorMaterial, Commands, Component, Mesh, PbrBundle, Res, ResMut, Sprite, SpriteBundle, Transform, Vec2, Vec3};
+use bevy::prelude::{default, Camera2dBundle, Camera3dBundle, Commands, Transform, Vec3};
 use bevy_render::camera::{Camera, ClearColorConfig};
 pub fn startup(
     mut commands: Commands

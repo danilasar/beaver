@@ -1,5 +1,5 @@
 use bevy::math::Vec2;
-use bevy::prelude::{default, Bundle, Component, Entity, Ref, Sprite, SpriteBundle, Transform, Vec3};
+use bevy::prelude::{default, Bundle, Component, Sprite, SpriteBundle, Transform, Vec3};
 use bevy_color::Color;
 use serde::Deserialize;
 

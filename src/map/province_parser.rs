@@ -1,6 +1,6 @@
-use log::{error, info};
+use log::error;
 use serde::Deserialize;
-use crate::map::components::{Province, ProvinceId, TerrainType, VictoryPoints};
+use crate::map::components::{ProvinceId, TerrainType, VictoryPoints};
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct ProvinceData {

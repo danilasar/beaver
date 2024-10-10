@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 use serde::de::DeserializeOwned;
-use serde::Deserialize;
 
 pub fn read_file(path_buf: PathBuf) -> std::io::Result<String> {
-    if(!path_buf.exists()) {
+    if !path_buf.exists() {
         return Err(std::io::Error::from(std::io::ErrorKind::NotFound));
     }
 

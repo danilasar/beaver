@@ -6,11 +6,8 @@ mod menu;
 mod utils;
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use std::any::TypeId;
 use std::fmt::Debug;
-use bevy::{prelude::*, sprite::Anchor};
-use bevy::ecs::observer::TriggerTargets;
-use bevy_color::palettes;
+use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
 
@@ -49,7 +46,7 @@ fn main() {
         .insert_resource(Volume(7))
         // Declare the game state, whose starting value is determined by the `Default` trait
         .init_state::<GameState>()
-        .add_systems(Startup, (camera::startup::startup))
+        .add_systems(Startup, camera::startup::startup)
         // Adds the plugins for each state
         .add_plugins((splash::splash_plugin, menu::menu_plugin, world::game_plugin))
         .add_plugins(WorldInspectorPlugin::new())
