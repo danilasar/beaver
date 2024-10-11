@@ -3,7 +3,7 @@ use serde::Deserialize;
 use crate::map::components::{ProvinceId, TerrainType, VictoryPoints};
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct ProvinceData {
+pub struct ProvinceData {
     pub id: ProvinceId,
     pub x: f32,
     pub y: f32,
