@@ -5,6 +5,6 @@ enum MouseEvent {
 	Hover,
 	Unhover
 }
-pub(crate) trait EntityEvent {
+pub trait EntityEvent {
 	fn get_entity(&self) -> Entity;
 }

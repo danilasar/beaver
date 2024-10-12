@@ -4,11 +4,9 @@ pub mod events;
 pub mod resources;
 
 use bevy::app::App;
-use bevy::prelude::{in_state, on_event, IntoSystemConfigs, OnEnter, Update};
+use bevy::prelude::{on_event, IntoSystemConfigs, Update};
 use crate::province::events::*;
-use crate::province::resources::*;
 use crate::province::systems::*;
-use super::GameState;
 
 
 pub struct Provinces;

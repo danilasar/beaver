@@ -1,12 +1,5 @@
-use std::collections::VecDeque;
-use bevy::ecs::system::SystemState;
-use bevy::math::Vec3;
-use bevy::prelude::{Changed, Entity, Event, EntityWorldMut, Query, Sprite, With, World, EventReader, ResMut};
-use bevy::utils::tracing::event;
-use bevy_color::Color;
-use bevy_mod_picking::prelude::{Click, ListenerInput, On, Over, Out, PickingInteraction, Pointer};
-use log::info;
-use crate::core::components::DefaultColor;
+use bevy::prelude::{Entity, Event};
+use bevy_mod_picking::prelude::{Click, ListenerInput, Over, Out, Pointer};
 use crate::core::events::EntityEvent;
 
 #[derive(Event)]
