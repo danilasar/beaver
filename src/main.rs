@@ -4,6 +4,7 @@ mod core;
 mod world;
 mod menu;
 mod utils;
+mod province;
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::fmt::Debug;
