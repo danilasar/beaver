@@ -13,3 +13,6 @@ bevy_color = "0.14.3"
 bevy_render="0.14.2"
 serde = { version = "1.0.210", features = ["derive", "std"] }
 toml = "0.8.19"
+bevy_vector_shapes = "0.8.2"
+bevy_prototype_lyon = "0.12.0"
+lyon = "1.0.1"

@@ -1,6 +1,7 @@
 use log::error;
 use serde::Deserialize;
-use crate::province::components::{ProvinceId, TerrainType, VictoryPoints};
+use crate::simulation::province::components::province::{ProvinceId, TerrainType, VictoryPoints};
+use crate::utils::io::read_toml::read_toml;
 
 #[derive(Debug, Deserialize)]
 pub struct ProvinceData {
@@ -19,11 +20,12 @@ struct ProvincesList {
 
 pub fn parse_provinces() -> Vec<ProvinceData> {
 	let toml_path = std::path::PathBuf::from(std::path::Path::new("map/provinces.toml"));
-	let provinces_data : std::io::Result<ProvincesList> = crate::utils::read_toml::<ProvincesList>(toml_path.clone());
-	if let Err(e) = provinces_data {
-		error!("Error parsing {}: {}", toml_path.to_str().unwrap_or("provinces.toml"), e);
-		panic!();
-	}
-	let provinces_data = provinces_data.unwrap().provinces;
+	let provinces_data : Vec<ProvinceData> = match read_toml::<ProvincesList>(toml_path.clone()) {
+		Ok(provinces_list) => provinces_list.provinces,
+		Err(error) => {
+			error!("Error parsing {}: {}", toml_path.to_str().unwrap_or("provinces.toml"), error);
+			panic!();
+		}
+	};
 	provinces_data
 }

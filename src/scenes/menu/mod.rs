@@ -1,7 +1,9 @@
 use bevy::{app::AppExit, color::palettes::css::CRIMSON, prelude::*};
+use crate::despawn_screen;
+use crate::system::GameState;
+use crate::ui::{DisplayQuality, Volume};
 
-use super::{despawn_screen, DisplayQuality, GameState, Volume, TEXT_COLOR};
-
+const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 // This plugin manages the menu, with 5 different screens:
 // - a main menu with "New Game", "Settings", "Quit"
 // - a settings menu with two submenus and a back button

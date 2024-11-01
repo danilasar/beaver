@@ -1,6 +1,6 @@
 use bevy::prelude::{Entity, Event};
 use bevy_mod_picking::prelude::{Click, ListenerInput, Over, Out, Pointer};
-use crate::core::events::EntityEvent;
+use crate::utils::events::EntityEvent;
 
 #[derive(Event)]
 pub struct ProvinceHoverEvent(Entity);

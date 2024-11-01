@@ -1,13 +1,11 @@
+use bevy::app::Update;
+use bevy::prelude::{on_event, App, IntoSystemConfigs};
+use events::{ ProvinceHoverEvent, ProvinceUnhoverEvent, ProvinceClickEvent };
+use systems::{province_click_listener, province_hover_listener, province_unhover_listener};
+
+mod components;
+mod events;
 mod systems;
-pub mod components;
-pub mod events;
-pub mod resources;
-
-use bevy::app::App;
-use bevy::prelude::{on_event, IntoSystemConfigs, Update};
-use crate::province::events::*;
-use crate::province::systems::*;
-
 
 pub struct Provinces;
 impl bevy::prelude::Plugin for Provinces {

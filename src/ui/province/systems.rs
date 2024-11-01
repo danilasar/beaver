@@ -3,11 +3,11 @@ use bevy::ecs::system::SystemState;
 use bevy::prelude::{Entity, EntityWorldMut, Event, EventReader, Sprite, World};
 use bevy_color::Color;
 use bevy_mod_picking::focus::PickingInteraction;
-use crate::core::components::DefaultColor;
-use crate::core::events::EntityEvent;
-use crate::province::components::Province;
-use crate::province::events::{ProvinceClickEvent, ProvinceHoverEvent, ProvinceUnhoverEvent};
-use crate::province::resources::ProvincesCollection;
+use crate::utils::components::DefaultColor;
+use crate::utils::events::EntityEvent;
+use crate::simulation::province::components::province::Province;
+use crate::simulation::province::resources::ProvincesCollection;
+use crate::ui::province::events::{ProvinceClickEvent, ProvinceHoverEvent, ProvinceUnhoverEvent};
 
 pub fn province_mouse_listener<T: Event + EntityEvent>(world: &mut World, picking_interaction: PickingInteraction) { // mut events: EventReader<ProvinceClickEvent>,
 	let entities = get_enitites_by_event::<T>(world);

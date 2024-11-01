@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use bevy::prelude::{Entity, Resource};
-use crate::province::components::ProvinceId;
+use crate::simulation::province::components::province::ProvinceId;
 
 #[derive(Debug, Default, Resource)]
 pub struct ProvincesCollection {
